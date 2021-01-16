@@ -1,0 +1,25 @@
+﻿<Properties StartupConfiguration="{46096C68-EFD8-4B24-AE0E-AFC4B7B88CC8}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="TG_bot/Program.cs">
+    <Files>
+      <File FileName="TG_bot/Program.cs" Line="198" Column="47" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="TG_bot" expanded="True">
+            <Node name="TG_bot" expanded="True">
+              <Node name="Program.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.TG__bot PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
