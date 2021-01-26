@@ -1,0 +1,4 @@
+/Users/leonzaitsev/Projects/info_bot/TG_bot/obj/Debug/netcoreapp3.1/TG_bot.csprojAssemblyReference.cache
+/Users/leonzaitsev/Projects/info_bot/TG_bot/obj/Debug/netcoreapp3.1/TG_bot.AssemblyInfoInputs.cache
+/Users/leonzaitsev/Projects/info_bot/TG_bot/obj/Debug/netcoreapp3.1/TG_bot.AssemblyInfo.cs
+/Users/leonzaitsev/Projects/info_bot/TG_bot/obj/Debug/netcoreapp3.1/TG_bot.csproj.CoreCompileInputs.cache
