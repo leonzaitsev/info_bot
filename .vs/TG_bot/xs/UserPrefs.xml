@@ -2,17 +2,15 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="TG_bot/core/ICommandProcessor.cs">
     <Files>
       <File FileName="TG_bot/Program.cs" Line="198" Column="1" />
-      <File FileName="TG_bot/core/RurCommandProcessor.cs" Line="1" Column="1" />
+      <File FileName="TG_bot/core/RurCommandProcessor.cs" />
       <File FileName="TG_bot/core/ICommandProcessor.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="TG_bot" expanded="True">
+          <Node name="TG_bot" expanded="True" selected="True">
             <Node name="TG_bot" expanded="True">
-              <Node name="core" expanded="True">
-                <Node name="ICommandProcessor.cs" selected="True" />
-              </Node>
+              <Node name="core" expanded="True" />
             </Node>
           </Node>
         </State>
