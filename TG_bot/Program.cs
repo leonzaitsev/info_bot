@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Html.Parser;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,6 +17,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using TG_bot.Core;
 
 namespace TG_bot
 {
@@ -25,6 +27,12 @@ namespace TG_bot
 
         public static async Task Main()
         {
+
+            commandProcessors.Add("usd", new UsdCommandProcessor());
+            commandProcessors.Add("eur", new EurCommandProcessor());
+            commandProcessors.Add("rur", new RurCommandProcessor());
+            commandProcessors.Add("grn", new GrnCommandProcessor());
+
 #if USE_PROXY
             var Proxy = new WebProxy(Configuration.Proxy.Host, Configuration.Proxy.Port) { UseDefaultCredentials = true };
             Bot = new TelegramBotClient(Configuration.BotToken, webProxy: Proxy);
@@ -128,108 +136,29 @@ namespace TG_bot
             }
         }
 
+        private static IDictionary<string, ICommandProcessor> commandProcessors = new Dictionary<string, ICommandProcessor>();
+
         // Process Inline Keyboard callback data
         private static async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
         {
-            var httpClient = new HttpClient();
-            var html = await httpClient.GetStringAsync("https://finance.tut.by/kurs/minsk/");
-            var minskWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/minsk");
-            var mogilevWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/mogilev/");
-            var gomelWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/gomel/");
-            var grodnoWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/grodno/");
-            var brestWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/brest/");
-            var vitebskWeatherHtml = await httpClient.GetStringAsync("https://pogoda.tut.by/city/vitebsk/");
-            var parser = new HtmlParser();
-            var document = await parser.ParseDocumentAsync(html);
-            var minskWeather = await parser.ParseDocumentAsync(minskWeatherHtml);
-            var mogilevWeather = await parser.ParseDocumentAsync(mogilevWeatherHtml);
-            var gomelWeather = await parser.ParseDocumentAsync(gomelWeatherHtml);
-            var grodnoWeather = await parser.ParseDocumentAsync(grodnoWeatherHtml);
-            var brestWeather = await parser.ParseDocumentAsync(brestWeatherHtml);
-            var vitebskWeather = await parser.ParseDocumentAsync(vitebskWeatherHtml);
-            var str = "#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp"; 
             var result = "Not Found";
-            switch (callbackQuery.Data)
+            if (commandProcessors.ContainsKey(callbackQuery.Data))
             {
-                case "/usd":
-                    result = document.QuerySelector("#content-band > div.col-c > div > div > div.b-cnt > table > tbody > tr:nth-child(1) > td:nth-child(2) > div > p").TextContent;
-                    break;
-
-
-                case "/eur":
-                    result = document.QuerySelector("#content-band > div.col-c > div > div > div.b-cnt > table > tbody > tr:nth-child(3) > td:nth-child(2) > div > p").TextContent;
-                    break;
-            
-
-               case "/rur":
-                    result = document.QuerySelector("#content-band > div.col-c > div > div > div.b-cnt > table > tbody > tr:nth-child(4) > td.inctances > div > p:nth-child(2)").TextContent;
-                    break;
-
-                case "/grn":
-                    result = document.QuerySelector("#content-band > div.col-c > div > div > div.b-cnt > table > tbody > tr:nth-child(7) > td.inctances > div > p:nth-child(2)").TextContent;
-                    break;
-
-                case "/minsk":
-                    result = minskWeather.QuerySelector("#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp").TextContent;
-                    break;
-
-                case "/mogilev":
-                    result = mogilevWeather.QuerySelector("#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp").TextContent;
-                    break;
-
-                case "/gomel":
-                    result = gomelWeather.QuerySelector(str).TextContent;
-                    break;
-
-                case "/grodno":
-                    result = grodnoWeather.QuerySelector("#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp").TextContent;
-                    break;
-
-                case "/brest":
-                    result = brestWeather.QuerySelector("#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp").TextContent;
-                    break;
-
-                case "/vitebsk":
-                    result = vitebskWeather.QuerySelector("#simple_mode > div > div.b-forecast-top__item.b-forecast-top--gen > div.b-forecast-top__wrap > div.b-forecast-top__temp").TextContent;
-                    break;
-
+                var commandProcessor = commandProcessors[callbackQuery.Data];
+                result = await commandProcessor.ProcessCommand();
             }
             await Bot.SendTextMessageAsync(
-                callbackQuery.Message.Chat.Id,
-                result
-            );
+                    callbackQuery.Message.Chat.Id,
+                    result
+                );
+
         }
 
-        #region Inline Mode
-
-        private static async Task BotOnInlineQueryReceived(InlineQuery inlineQuery)
-        {
-            Console.WriteLine($"Received inline query from: {inlineQuery.From.Id}");
-
-            InlineQueryResultBase[] results = {
-                // displayed result
-                new InlineQueryResultArticle(
-                    id: "3",
-                    title: "TgBots",
-                    inputMessageContent: new InputTextMessageContent(
-                        "hello"
-                    )
-                )
-            };
-
-            await Bot.AnswerInlineQueryAsync(
-                inlineQuery.Id,
-                results,
-                isPersonal: true,
-                cacheTime: 0
-            );
-        }
-        #endregion
-
-        private static async Task UnknownUpdateHandlerAsync(Update update)
+       private static async Task UnknownUpdateHandlerAsync(Update update)
         {
             Console.WriteLine($"Unknown update type: {update.Type}");
         }
+
 
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
@@ -241,5 +170,6 @@ namespace TG_bot
 
             Console.WriteLine(ErrorMessage);
         }
+     
     }
 }
